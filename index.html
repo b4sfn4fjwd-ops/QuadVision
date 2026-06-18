@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuadVision – Completing the Square</title>
+  <link rel="icon" href="images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <svg viewBox="0 0 24 24" fill="none" width="26" height="26">
+        <rect x="3" y="3" width="8" height="8" rx="2" fill="var(--blue)" opacity=".9"/>
+        <rect x="13" y="3" width="8" height="8" rx="2" fill="var(--amber)" opacity=".85"/>
+        <rect x="3" y="13" width="8" height="8" rx="2" fill="var(--amber)" opacity=".85"/>
+        <rect x="13" y="13" width="8" height="8" rx="2" fill="var(--purple)" opacity=".9"/>
+      </svg>
+      <span class="sidebar-brand-name">QuadVision</span>
+    </div>
+    <ul class="sidebar-nav">
+      <li class="sidebar-item active" id="sNav-home" onclick="sidebarScrollTo('hero', this)">
+        <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M3 9.75L12 3l9 6.75V21a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z"/><path d="M9 22V12h6v10"/></svg>
+        <span class="sidebar-label" data-en="Home" data-ms="Laman Utama">Home</span>
+      </li>
+      <li class="sidebar-item" id="sNav-app" onclick="sidebarScrollTo('appSection', this)">
+        <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M4 20 Q12 4 20 20" stroke-linecap="round"/><circle cx="12" cy="10" r="1.5" fill="currentColor" stroke="none"/><line x1="4" y1="20" x2="20" y2="20"/><line x1="4" y1="4" x2="4" y2="20"/></svg>
+        <span class="sidebar-label" data-en="Visualiser" data-ms="Penggambar">Visualiser</span>
+      </li>
+      <li class="sidebar-item" id="sNav-steps" onclick="sidebarScrollTo('resultsSection', this)">
+        <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke-linecap="round"/></svg>
+        <span class="sidebar-label" data-en="Steps" data-ms="Langkah">Steps</span>
+      </li>
+      <li class="sidebar-item" id="sNav-team" onclick="sidebarScrollTo('teamSection', this)">
+        <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><circle cx="9" cy="7" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="18" cy="8" r="2.5"/><path d="M15.5 20c0-2.5 1.1-4.5 3-5.3"/></svg>
+        <span class="sidebar-label" data-en="Team" data-ms="Pasukan">Team</span>
+      </li>
+    </ul>
+    <div class="sidebar-bottom">
+      <div class="sidebar-kie">
+        <span class="sidebar-kie-dot"></span>
+        <span class="sidebar-label sidebar-kie-label">KIE 2026</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="grid-overlay"></div>
+
+    <span class="hero-badge">
+      <svg viewBox="0 0 16 16" fill="currentColor" width="13" height="13"><path d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8z"/><path d="M8 4a.75.75 0 01.75.75v3.5h2a.75.75 0 010 1.5H7.25V4.75A.75.75 0 018 4z"/></svg>
+      KMJ Innovation Expo &#xB7; KIE 2026
+    </span>
+
+    <div class="hero-topbar">
+      <button class="hero-topbar-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">
+        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke-linecap="round"/></svg>
+        <span id="themeLabel">Light</span>
+      </button>
+      <button class="hero-topbar-btn lang-toggle" id="langToggle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 2a10 10 0 110 20A10 10 0 0112 2z"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg>
+        <span id="langLabel">BM</span>
+      </button>
+    </div>
+
+    <!-- Title — JS will type this out -->
+    <h1 id="heroTitle" aria-label="See the Square Behind the Equation">
+      <span class="hero-line">See the <span class="accent" id="heroWord1">Square</span></span>
+      <span class="hero-line hero-line-2">Behind the <span class="accent2" id="heroWord2">Equation</span></span>
+    </h1>
+
+    <p id="heroPara" data-en="Watch quadratic expressions transform into geometric squares — step by step, tile by tile — making the algebra truly visible." data-ms="Saksikan ungkapan kuadratik berubah menjadi segiempat geometri — langkah demi langkah, jubin demi jubin — menjadikan algebra benar-benar kelihatan.">Watch quadratic expressions transform into geometric squares — step by step, tile by tile — making the algebra truly visible.</p>
+
+    <canvas id="heroCanvas" aria-hidden="true"></canvas>
+
+    <button class="hero-cta" onclick="document.getElementById('appSection').scrollIntoView({behavior:'smooth'})">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      <span data-en="Start Visualising" data-ms="Mula Menggambar">Start Visualising</span>
+    </button>
+  </section>
+
+  <!-- APP -->
+  <main class="app" id="appSection">
+
+    <!-- INPUT PANEL -->
+    <div class="input-panel reveal" id="inputPanel">
+
+      <!-- top row: label + action buttons -->
+      <div class="ip-toprow">
+        <div>
+          <div class="section-label" data-en="Quadratic Expression" data-ms="Ungkapan Kuadratik">Quadratic Expression</div>
+          <div class="section-title" data-en="Enter your equation" data-ms="Masukkan persamaan anda">Enter your equation</div>
+        </div>
+        <div class="ip-toprow-btns">
+          <button class="ip-scan-btn" id="scanPhotoBtn" onclick="togglePhotoSection()" title="Scan equation from a photo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span data-en="Scan Photo" data-ms="Imbas Foto">Scan Photo</span>
+          </button>
+          <button class="ip-hist-btn" id="historyBtn" onclick="toggleHistoryPanel()" title="View equation history">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span data-en="History" data-ms="Sejarah">History</span>
+          </button>
+          <button class="btn-share" id="btnShare" title="Share equation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- live equation display -->
+      <div class="eq-live">
+        <span class="eq-live-label">f(x) =</span>
+        <span class="eq-val-a" id="eqValA">a</span><span class="eq-mono">x&#xB2;</span>
+        <span class="eq-op" id="eqOpB">+</span>
+        <span class="eq-val-b" id="eqValB">b</span><span class="eq-mono">x</span>
+        <span class="eq-op" id="eqOpC">+</span>
+        <span class="eq-val-c" id="eqValC">c</span>
+        <span class="eq-live-zero">= 0</span>
+      </div>
+
+      <!-- three coefficient cards -->
+      <div class="coeff-cards">
+
+        <div class="coeff-card coeff-card-a">
+          <div class="cc-top">
+            <span class="cc-letter">a</span>
+            <span class="cc-role" data-en="Width &amp; direction" data-ms="Lebar &amp; arah">Width &amp; direction</span>
+          </div>
+          <input type="number" id="coeff-a" placeholder="1" step="1" min="-20" max="20" />
+          <div class="cc-term">coefficient of x&#xB2;</div>
+        </div>
+
+        <div class="coeff-card coeff-card-b">
+          <div class="cc-top">
+            <span class="cc-letter">b</span>
+            <span class="cc-role" data-en="Horizontal shift" data-ms="Anjakan mendatar">Horizontal shift</span>
+          </div>
+          <input type="number" id="coeff-b" placeholder="6" step="1" min="-20" max="20" />
+          <div class="cc-term">coefficient of x</div>
+        </div>
+
+        <div class="coeff-card coeff-card-c">
+          <div class="cc-top">
+            <span class="cc-letter">c</span>
+            <span class="cc-role" data-en="Y-intercept" data-ms="Pintasan-y">Y-intercept</span>
+          </div>
+          <input type="number" id="coeff-c" placeholder="5" step="1" min="-50" max="50" />
+          <div class="cc-term">constant term</div>
+        </div>
+
+      </div>
+
+      <!-- photo scan section (toggled) -->
+      <div class="photo-section hidden" id="photoSection">
+        <div class="photo-or">
+          <div class="photo-or-line"></div>
+          <span data-en="or scan from a photo" data-ms="atau imbas dari foto">or scan from a photo</span>
+          <div class="photo-or-line"></div>
+        </div>
+
+        <div class="photo-zone" id="photoZone">
+          <input type="file" id="photoFileInput" accept="image/*" style="display:none">
+
+          <!-- idle -->
+          <div class="pz-idle" id="pzIdle">
+            <svg class="pz-cam-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" width="40" height="40">
+              <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            <p class="pz-title" data-en="Drop an equation image here" data-ms="Lepaskan imej persamaan di sini">Drop an equation image here</p>
+            <p class="pz-sub" data-en="Handwritten or printed — we'll extract the numbers" data-ms="Tulisan tangan atau cetak — kami ekstrak nombor">Handwritten or printed — we'll extract the numbers</p>
+            <button class="pz-browse-btn" onclick="document.getElementById('photoFileInput').click()" data-en="Choose a file" data-ms="Pilih fail">Choose a file</button>
+            <p class="pz-formats">PNG &middot; JPG &middot; WEBP &middot; max 10 MB</p>
+          </div>
+
+          <!-- processing -->
+          <div class="pz-processing hidden" id="pzProcessing">
+            <img class="pz-thumb" id="pzThumb" src="" alt="equation image">
+            <div class="pz-proc-info">
+              <div class="pz-spinner"></div>
+              <span class="pz-proc-label" id="pzProcLabel">Reading equation&hellip;</span>
+              <span class="pz-proc-sub" id="pzProcSub">Loading OCR engine (first use ~10 MB)</span>
+            </div>
+          </div>
+
+          <!-- done -->
+          <div class="pz-done hidden" id="pzDone">
+            <img class="pz-thumb" id="pzDoneThumb" src="" alt="equation image">
+            <div class="pz-done-info">
+              <div class="pz-ocr-label" data-en="Detected text" data-ms="Teks dikesan">Detected text</div>
+              <div class="pz-ocr-text" id="pzOcrText"></div>
+              <div class="pz-eq-result" id="pzEqResult"></div>
+            </div>
+            <button class="pz-retry-btn" onclick="resetPhotoZone()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="13" height="13"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+              <span data-en="Try another" data-ms="Cuba lain">Try another</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- visualise button -->
+      <button class="btn-solve" id="btnSolve">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span data-en="Visualise Equation" data-ms="Gambarkan Persamaan">Visualise Equation</span>
+      </button>
+
+      <!-- presets -->
+      <div class="presets-row">
+        <span class="presets-label" data-en="Try a preset:" data-ms="Cuba pratetap:">Try a preset:</span>
+        <div class="preset-chips">
+          <button class="preset-btn" data-a="1"  data-b="6"  data-c="5">x&#xB2;+6x+5</button>
+          <button class="preset-btn" data-a="1"  data-b="-4" data-c="4">x&#xB2;&#x2212;4x+4 <em>double</em></button>
+          <button class="preset-btn" data-a="2"  data-b="-4" data-c="2">2x&#xB2;&#x2212;4x+2</button>
+          <button class="preset-btn" data-a="1"  data-b="2"  data-c="5">x&#xB2;+2x+5 <em>complex</em></button>
+          <button class="preset-btn" data-a="1"  data-b="-6" data-c="9">x&#xB2;&#x2212;6x+9</button>
+        </div>
+      </div>
+
+      <div class="banner" id="banner"></div>
+      <div class="formula-band" id="liveFormula"></div>
+    </div>
+
+    <!-- HISTORY PANEL -->
+    <div class="history-panel hidden" id="historyPanel">
+      <div class="hist-header">
+        <div class="hist-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span data-en="Equation History" data-ms="Sejarah Persamaan">Equation History</span>
+        </div>
+        <button class="hist-clear-btn" onclick="clearHistory()" data-en="Clear all" data-ms="Padam semua">Clear all</button>
+      </div>
+
+      <div class="hist-empty hidden" id="histEmpty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32"><path d="M12 2a10 10 0 110 20A10 10 0 0112 2z"/><path d="M12 8v4l3 3"/></svg>
+        <p data-en="No equations studied yet" data-ms="Tiada persamaan dipelajari lagi">No equations studied yet</p>
+      </div>
+
+      <div class="hist-list" id="histList"></div>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="resultsSection">
+
+      <div class="results-grid reveal">
+        <div class="card">
+          <div class="card-title" data-en="Step-by-step Walkthrough" data-ms="Panduan Langkah demi Langkah">Step-by-step Walkthrough</div>
+          <ul class="steps-list" id="stepsList"></ul>
+        </div>
+        <div class="card summary-card">
+          <div>
+            <div class="card-title" data-en="Completed Square Form" data-ms="Bentuk Kuasa Dua Sempurna">Completed Square Form</div>
+            <div class="formula-band" id="completedForm"></div>
+          </div>
+          <div>
+            <div class="card-title" data-en="Vertex (Turning Point)" data-ms="Bucu (Titik Pusingan)">Vertex (Turning Point)</div>
+            <div class="vertex-row">
+              <span class="vertex-label" data-en="Vertex =" data-ms="Bucu =">Vertex =</span>
+              <span id="vertexVal"></span>
+            </div>
+          </div>
+          <div>
+            <div class="card-title" data-en="Roots / Solutions" data-ms="Punca / Penyelesaian">Roots / Solutions</div>
+            <div class="roots-box" id="rootsBox"></div>
+          </div>
+          <div>
+            <div class="card-title" data-en="Discriminant" data-ms="Pembeza">Discriminant</div>
+            <div class="disc-row" id="discRow"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANIMATION STAGE -->
+      <div class="anim-stage-wrap reveal">
+
+        <div class="anim-header">
+          <div>
+            <div class="section-label" data-en="Geometric Formation" data-ms="Pembentukan Geometri">Geometric Formation</div>
+            <div class="anim-stage-title" data-en="Watch the Square Form" data-ms="Perhatikan Segiempat Terbentuk">Watch the Square Form</div>
+            <div class="anim-subtitle" id="animSubtitle"></div>
+          </div>
+          <div class="kbd-hints">
+            <span class="kbd-badge"><kbd>&#x2190;</kbd><kbd>&#x2192;</kbd><span class="kbd-desc" data-en="navigate" data-ms="navigasi">navigate</span></span>
+            <span class="kbd-badge"><kbd>Space</kbd><span class="kbd-desc" data-en="play" data-ms="main">play</span></span>
+            <span class="kbd-badge"><kbd>R</kbd><span class="kbd-desc" data-en="reset" data-ms="tetap semula">reset</span></span>
+          </div>
+        </div>
+
+        <div class="legend" id="legend">
+          <div class="legend-item"><div class="legend-swatch swatch-x2"></div><span data-en="x&#xB2; area" data-ms="kawasan x&#xB2;">x&#xB2; area</span></div>
+          <div class="legend-item"><div class="legend-swatch swatch-bx"></div><span data-en="&#xBD;bx rectangles" data-ms="segiempat tepat &#xBD;bx">&#xBD;bx rectangles</span></div>
+          <div class="legend-item"><div class="legend-swatch swatch-comp"></div><span data-en="(b/2a)&#xB2; corner piece" data-ms="kepingan sudut (b/2a)&#xB2;">(b/2a)&#xB2; corner piece</span></div>
+          <div class="legend-item"><div class="legend-swatch swatch-sub"></div><span data-en="subtracted to balance" data-ms="ditolak untuk mengimbang">subtracted to balance</span></div>
+        </div>
+
+        <div class="phase-stepper" id="phaseIndicator"></div>
+
+        <div class="anim-controls-bar">
+          <div class="anim-controls">
+            <button class="btn-anim btn-prev" id="btnPrev">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M15 18l-6-6 6-6"/></svg>
+              <span data-en="Prev" data-ms="Sebelum">Prev</span>
+            </button>
+            <button class="btn-anim btn-play" id="btnPlay">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
+              <span id="playLabel" data-en="Play" data-ms="Main">Play</span>
+            </button>
+            <button class="btn-anim btn-next" id="btnNext">
+              <span data-en="Next" data-ms="Seterus">Next</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+            <button class="btn-anim btn-reset" id="btnReset">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="14" height="14"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              <span data-en="Reset" data-ms="Tetap Semula">Reset</span>
+            </button>
+          </div>
+          <label class="speed-control">
+            <span class="speed-label" data-en="Speed" data-ms="Kelajuan">Speed</span>
+            <input type="range" id="speedSlider" min="0.5" max="3" step="0.5" value="1" class="speed-slider" />
+            <span class="speed-val" id="speedVal">1&#xD7;</span>
+          </label>
+        </div>
+
+        <canvas id="animCanvas"></canvas>
+
+        <div class="completion-badge hidden" id="completionBadge">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <span><span data-en="Square complete! Vertex at" data-ms="Segiempat lengkap! Bucu pada">Square complete! Vertex at</span> <strong id="badgeVertex"></strong></span>
+        </div>
+
+        <div class="phase-caption" id="phaseCaption"></div>
+
+      </div>
+
+      <!-- PARABOLA GRAPH -->
+      <div class="card reveal graph-card">
+        <div class="card-title" data-en="Parabola Graph" data-ms="Graf Parabola">Parabola Graph</div>
+        <canvas id="graphCanvas"></canvas>
+      </div>
+
+      <!-- QUIZ SECTION (populated by JS when animation completes) -->
+      <div class="quiz-card card reveal hidden" id="quizSection">
+        <div class="quiz-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          <span class="card-title" id="quizCardTitle" data-en="Test Your Understanding" data-ms="Uji Kefahaman Anda">Test Your Understanding</span>
+        </div>
+        <div class="quiz-questions" id="quizQuestions"></div>
+        <div class="quiz-result hidden" id="quizResult">
+          <div class="quiz-score-badge" id="quizScoreBadge"></div>
+          <div class="quiz-result-msg" id="quizResultMsg"></div>
+          <button class="quiz-retry" id="quizRetry">
+            <span data-en="Try Again" data-ms="Cuba Lagi">Try Again</span>
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /resultsSection -->
+
+  </main>
+
+  <!-- TEAM SECTION -->
+  <section class="team-section" id="teamSection">
+    <div class="team-inner">
+      <div class="team-header">
+        <span class="section-label" data-en="Our Team" data-ms="Pasukan Kami">Our Team</span>
+        <h2 class="team-title" data-en="Meet the Group" data-ms="Kenali Kumpulan">Meet the Group</h2>
+        <p class="team-sub">KMJ Innovation Expo KIE 2026 &#xB7; Pengajaran &amp; Pembelajaran</p>
+      </div>
+      <div class="team-grid">
+
+        <!-- LEADER card — first slot, special gold styling -->
+        <div class="member-card leader-card">
+          <div class="leader-crown">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M2 19h20v2H2zM2 7l5 5 5-8 5 8 5-5v10H2V7z"/></svg>
+            <span data-en="Group Leader" data-ms="Ketua Kumpulan">Group Leader</span>
+          </div>
+          <div class="member-avatar" style="--av-color:#F59E0B">
+            <span class="avatar-initials">L</span>
+          </div>
+          <div class="member-info">
+            <div class="member-name" data-en="Leader Name" data-ms="Nama Ketua">Leader Name</div>
+            <div class="member-role" data-en="Leader / Form" data-ms="Ketua / Tingkatan">Leader / Form</div>
+          </div>
+          <div class="member-quote">"<span data-en="A great leader's words go here." data-ms="Kata-kata pemimpin yang hebat di sini.">A great leader's words go here.</span>"</div>
+        </div>
+
+        <div class="member-card">
+          <div class="member-avatar" style="--av-color:#2563EB">
+            <span class="avatar-initials">A</span>
+          </div>
+          <div class="member-info">
+            <div class="member-name" data-en="Member Name" data-ms="Nama Ahli">Member Name</div>
+            <div class="member-role" data-en="Role / Form" data-ms="Peranan / Tingkatan">Role / Form</div>
+          </div>
+          <div class="member-quote">"<span data-en="Their quote or words go here." data-ms="Kata-kata mereka di sini.">Their quote or words go here.</span>"</div>
+        </div>
+
+        <div class="member-card">
+          <div class="member-avatar" style="--av-color:#D97706">
+            <span class="avatar-initials">B</span>
+          </div>
+          <div class="member-info">
+            <div class="member-name" data-en="Member Name" data-ms="Nama Ahli">Member Name</div>
+            <div class="member-role" data-en="Role / Form" data-ms="Peranan / Tingkatan">Role / Form</div>
+          </div>
+          <div class="member-quote">"<span data-en="Their quote or words go here." data-ms="Kata-kata mereka di sini.">Their quote or words go here.</span>"</div>
+        </div>
+
+        <div class="member-card">
+          <div class="member-avatar" style="--av-color:#7C3AED">
+            <span class="avatar-initials">C</span>
+          </div>
+          <div class="member-info">
+            <div class="member-name" data-en="Member Name" data-ms="Nama Ahli">Member Name</div>
+            <div class="member-role" data-en="Role / Form" data-ms="Peranan / Tingkatan">Role / Form</div>
+          </div>
+          <div class="member-quote">"<span data-en="Their quote or words go here." data-ms="Kata-kata mereka di sini.">Their quote or words go here.</span>"</div>
+        </div>
+
+        <div class="member-card">
+          <div class="member-avatar" style="--av-color:#059669">
+            <span class="avatar-initials">D</span>
+          </div>
+          <div class="member-info">
+            <div class="member-name" data-en="Member Name" data-ms="Nama Ahli">Member Name</div>
+            <div class="member-role" data-en="Role / Form" data-ms="Peranan / Tingkatan">Role / Form</div>
+          </div>
+          <div class="member-quote">"<span data-en="Their quote or words go here." data-ms="Kata-kata mereka di sini.">Their quote or words go here.</span>"</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    QuadVision &nbsp;&#xB7;&nbsp; KMJ Innovation Expo KIE 2026 &nbsp;&#xB7;&nbsp; Pengajaran &amp; Pembelajaran
+  </footer>
+
+  <div class="share-toast" id="shareToast">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><path d="M20 6L9 17l-5-5"/></svg>
+    <span data-en="Link copied!" data-ms="Pautan disalin!">Link copied!</span>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
