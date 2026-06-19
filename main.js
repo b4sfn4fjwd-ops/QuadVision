@@ -348,10 +348,6 @@ function solve() {
     if (el) el.classList.add('visible');
   }, 150 + i * 160));
 
-  // Hide quiz until animation completes
-  const quizSec = document.getElementById('quizSection');
-  if (quizSec) quizSec.classList.add('hidden');
-
   // Init animation + graph
   setTimeout(() => {
     initAnimation();
@@ -581,7 +577,7 @@ function advancePhaseAnim() {
   if (ANIM.phase >= TOTAL_PHASES - 1) { pauseAnim(); return; }
 
   const toPhase  = ANIM.phase + 1;
-  const duration = 900 / SPEED;
+  const duration = 1600 / SPEED;
   const start    = performance.now();
 
   function tick(now) {
@@ -595,7 +591,7 @@ function advancePhaseAnim() {
       ANIM.phase = toPhase;
       updatePhaseUI(toPhase);
       if (toPhase < TOTAL_PHASES - 1) {
-        setTimeout(() => { if (ANIM && ANIM.playing) advancePhaseAnim(); }, 1100 / SPEED);
+        setTimeout(() => { if (ANIM && ANIM.playing) advancePhaseAnim(); }, 2000 / SPEED);
       } else {
         pauseAnim();
       }
@@ -622,7 +618,7 @@ function updatePhaseUI(phase) {
   // sync step highlight
   syncStepHighlight(phase);
 
-  // completion badge + confetti + quiz
+  // completion badge + confetti
   if (phase === TOTAL_PHASES - 1 && STATE) {
     const badge = document.getElementById('completionBadge');
     if (badge) {
@@ -635,7 +631,6 @@ function updatePhaseUI(phase) {
       ANIM.confetti      = spawnConfetti(ANIM.G);
       ANIM.confettiStart = performance.now();
     }
-    generateQuiz();
   }
 }
 
@@ -815,17 +810,17 @@ function drawBxRight(ctx, G, t) {
   const startX = W + 60;
   const x = lerp(startX, destX, easeOut(t));
   tile(ctx, x, oy, bPx, xPx, '#92400E', '#F59E0B', Math.min(1, t * 1.4), 8);
-  if (t > 0.5) {
-    const alpha = Math.min(1, (t - 0.5) * 2);
-    tileLabel(ctx, x, oy, bPx, xPx, `b\n2a·x`, '#FDE68A', 11);
+  if (t > 0.4) {
+    const hba = fmt(Math.abs(STATE.half_ba));
+    tileLabel(ctx, x, oy, bPx, xPx, `${hba}x`, '#FDE68A', Math.min(13, Math.max(9, bPx * 0.18)));
   }
   if (t >= 1) {
     // dimension tick
     ctx.save();
-    ctx.fillStyle = 'rgba(253,230,138,0.7)';
-    ctx.font = '500 11px Outfit';
+    ctx.fillStyle = 'rgba(253,230,138,0.85)';
+    ctx.font = '600 11px JetBrains Mono';
     ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-    ctx.fillText('b/2a', ox + xPx + bPx / 2, oy - 6);
+    ctx.fillText(fmt(Math.abs(STATE.half_ba)), ox + xPx + bPx / 2, oy - 6);
     ctx.restore();
   }
 }
@@ -837,20 +832,19 @@ function drawBxBottom(ctx, G, t) {
   const startY = H + 60;
   const y = lerp(startY, destY, easeOut(t));
   tile(ctx, ox, y, xPx, bPx, '#92400E', '#F59E0B', Math.min(1, t * 1.4), 8);
-  if (t > 0.5) {
-    tileLabel(ctx, ox, y, xPx, bPx, `b/2a·x`, '#FDE68A', 11);
+  if (t > 0.4) {
+    const hba = fmt(Math.abs(STATE.half_ba));
+    tileLabel(ctx, ox, y, xPx, bPx, `${hba}x`, '#FDE68A', Math.min(13, Math.max(9, bPx * 0.18)));
   }
   if (t >= 1) {
     // dimension tick – left side
     ctx.save();
-    ctx.save();
     ctx.translate(ox - 10, oy + xPx + bPx / 2);
     ctx.rotate(-Math.PI / 2);
-    ctx.fillStyle = 'rgba(253,230,138,0.7)';
-    ctx.font = '500 11px Outfit';
+    ctx.fillStyle = 'rgba(253,230,138,0.85)';
+    ctx.font = '600 11px JetBrains Mono';
     ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-    ctx.fillText('b/2a', 0, 0);
-    ctx.restore();
+    ctx.fillText(fmt(Math.abs(STATE.half_ba)), 0, 0);
     ctx.restore();
   }
 }
@@ -879,14 +873,14 @@ function drawCornerGap(ctx, G, t, anim) {
   ctx.fillText('?', cx, cy);
   ctx.restore();
 
-  // label
+  // label with actual value
   if (t > 0.6) {
     ctx.save();
     ctx.globalAlpha = (t - 0.6) / 0.4;
-    ctx.fillStyle = 'rgba(252,165,165,0.8)';
-    ctx.font = '500 11px JetBrains Mono';
+    ctx.fillStyle = 'rgba(252,165,165,0.9)';
+    ctx.font = '600 11px JetBrains Mono';
     ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-    ctx.fillText('(b/2a)²', cx, oy + xPx + bPx + 8);
+    ctx.fillText(`= ${fmt(STATE.corner)}`, cx, oy + xPx + bPx + 8);
     ctx.restore();
   }
 
@@ -916,8 +910,7 @@ function drawCornerDrop(ctx, G, t) {
 
   tile(ctx, ox + xPx, y, bPx, bPx, '#5B21B6', '#8B5CF6', alpha, 6);
   if (t > 0.5) {
-    const { half_ba } = STATE;
-    tileLabel(ctx, ox + xPx, y, bPx, bPx, `(b/2a)²`, '#DDD6FE', 10);
+    tileLabel(ctx, ox + xPx, y, bPx, bPx, fmt(STATE.corner), '#DDD6FE', Math.min(14, Math.max(9, bPx * 0.22)));
   }
 
   // value label
@@ -935,7 +928,7 @@ function drawCornerDrop(ctx, G, t) {
 function drawCornerFull(ctx, G, t) {
   const { ox, oy, xPx, bPx } = G;
   tile(ctx, ox + xPx, oy + xPx, bPx, bPx, '#5B21B6', '#8B5CF6', 1, 6);
-  tileLabel(ctx, ox + xPx, oy + xPx, bPx, bPx, `(b/2a)²`, '#DDD6FE', 10);
+  tileLabel(ctx, ox + xPx, oy + xPx, bPx, bPx, fmt(STATE.corner), '#DDD6FE', Math.min(14, Math.max(9, bPx * 0.22)));
 }
 
 function drawSubtractNote(ctx, G, t) {
@@ -996,12 +989,14 @@ function drawFinalSquare(ctx, G, t) {
 
   // labels
   if (t > 0.4) {
-    const la = Math.min(1, (t - 0.4) / 0.4);
+    const la  = Math.min(1, (t - 0.4) / 0.4);
+    const hba = fmt(Math.abs(STATE.half_ba));
+    const bSz = Math.min(13, Math.max(9, bPx * 0.18));
     ctx.save(); ctx.globalAlpha = la;
-    tileLabel(ctx, ox,       oy,       xPx, xPx, 'x²',      '#93C5FD', Math.max(14, xPx * 0.13));
-    tileLabel(ctx, ox + xPx, oy,       bPx, xPx, 'b/2a·x',  '#FDE68A', 10);
-    tileLabel(ctx, ox,       oy + xPx, xPx, bPx, 'b/2a·x',  '#FDE68A', 10);
-    tileLabel(ctx, ox + xPx, oy + xPx, bPx, bPx, '(b/2a)²', '#DDD6FE', 10);
+    tileLabel(ctx, ox,       oy,       xPx, xPx, 'x²',           '#93C5FD', Math.max(14, xPx * 0.13));
+    tileLabel(ctx, ox + xPx, oy,       bPx, xPx, `${hba}x`,      '#FDE68A', bSz);
+    tileLabel(ctx, ox,       oy + xPx, xPx, bPx, `${hba}x`,      '#FDE68A', bSz);
+    tileLabel(ctx, ox + xPx, oy + xPx, bPx, bPx, fmt(STATE.corner), '#DDD6FE', Math.min(14, Math.max(9, bPx * 0.22)));
     ctx.restore();
   }
 
@@ -1071,102 +1066,231 @@ function drawFinalSquare(ctx, G, t) {
 }
 
 // ─────────────────────────────────────────────────────────────
+//  GRAPH HELPERS
+// ─────────────────────────────────────────────────────────────
+function _gNice(rough) {
+  const e = Math.pow(10, Math.floor(Math.log10(Math.max(Math.abs(rough), 1e-10))));
+  const f = rough / e;
+  return (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * e;
+}
+function _gArrow(ctx, x, y, dir) {
+  const s = 6;
+  ctx.beginPath();
+  if (dir === 'right') { ctx.moveTo(x,y); ctx.lineTo(x-s,y-s*.45); ctx.lineTo(x-s,y+s*.45); }
+  else                 { ctx.moveTo(x,y); ctx.lineTo(x-s*.45,y+s); ctx.lineTo(x+s*.45,y+s); }
+  ctx.closePath(); ctx.fill();
+}
+function _gRR(ctx, x, y, w, h, r) {
+  r = Math.min(r, w/2, h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+}
+function _gTag(ctx, txt, x, y, col, opts) {
+  const { font='10px Outfit,sans-serif', bg='rgba(3,7,18,.78)', align='center', above=true } = opts || {};
+  ctx.save();
+  ctx.font = font; ctx.textAlign = align; ctx.textBaseline = 'alphabetic';
+  const tw = ctx.measureText(txt).width, px = 5, py = 3, fh = 12;
+  const bx = align === 'right' ? x - tw - px : align === 'left' ? x - px : x - tw / 2 - px;
+  const by = above ? y - fh - py * 2 : y;
+  ctx.fillStyle = bg;
+  _gRR(ctx, bx, by, tw + px * 2, fh + py * 2, 4);
+  ctx.fill();
+  ctx.fillStyle = col;
+  ctx.fillText(txt, x, above ? y - py : by + fh + py);
+  ctx.restore();
+}
+
+// ─────────────────────────────────────────────────────────────
 //  PARABOLA GRAPH
 // ─────────────────────────────────────────────────────────────
 function drawGraph() {
   if (!STATE) return;
-  const gc   = document.getElementById('graphCanvas');
-  const dpr  = window.devicePixelRatio || 1;
-  gc.width   = gc.offsetWidth  * dpr;
-  gc.height  = gc.offsetHeight * dpr;
-  const gctx = gc.getContext('2d');
-  gctx.scale(dpr, dpr);
+  const gc  = document.getElementById('graphCanvas');
+  if (!gc)  return;
+  const dpr = window.devicePixelRatio || 1;
+  gc.width  = gc.offsetWidth  * dpr;
+  gc.height = gc.offsetHeight * dpr;
+  const ctx = gc.getContext('2d');
+  ctx.scale(dpr, dpr);
 
   const W = gc.offsetWidth, H = gc.offsetHeight;
-  const { a, b, c, h, k, roots } = STATE;
+  const { a, b, c, h, k, roots, disc } = STATE;
 
-  const PAD = { l: 42, r: 20, t: 20, b: 32 };
-  const IW = W - PAD.l - PAD.r;
-  const IH = H - PAD.t - PAD.b;
+  const PAD = { l: 50, r: 30, t: 34, b: 44 };
+  const IW  = W - PAD.l - PAD.r;
+  const IH  = H - PAD.t - PAD.b;
 
   // domain
   const span = Math.max(5, Math.abs(STATE.half_ba) + 4);
   const xMin = h - span, xMax = h + span;
 
-  // compute y range
-  const pts = [];
-  for (let x = xMin; x <= xMax; x += (xMax - xMin) / 200)
-    pts.push(a * x * x + b * x + c);
-  const yPad  = Math.max(1, (Math.max(...pts) - Math.min(...pts)) * 0.15);
-  const yMin  = Math.min(...pts) - yPad;
-  const yMax  = Math.max(...pts) + yPad;
+  // 300-point sample for y range
+  const N = 300, ptX = [], ptY = [];
+  for (let i = 0; i <= N; i++) {
+    const x = xMin + (xMax - xMin) * i / N;
+    ptX.push(x); ptY.push(a * x * x + b * x + c);
+  }
+  const rawYMin = Math.min(...ptY), rawYMax = Math.max(...ptY);
+  const yRange  = Math.max(1, rawYMax - rawYMin);
+  const yPad    = yRange * 0.2;
+  const yMin = rawYMin - yPad, yMax = rawYMax + yPad;
 
-  const toX = x => PAD.l + ((x - xMin) / (xMax - xMin)) * IW;
-  const toY = y => PAD.t + IH - ((y - yMin) / (yMax - yMin)) * IH;
+  const toX  = xv => PAD.l + ((xv - xMin) / (xMax - xMin)) * IW;
+  const toY  = yv => PAD.t + IH - ((yv - yMin) / (yMax - yMin)) * IH;
+  const clpY = cy => Math.max(PAD.t - 2, Math.min(H - PAD.b + 2, cy));
 
-  // grid
-  gctx.strokeStyle = 'rgba(59,130,246,0.08)'; gctx.lineWidth = 1;
-  for (let x = Math.ceil(xMin); x <= Math.floor(xMax); x++) {
+  ctx.clearRect(0, 0, W, H);
+
+  // ── GRID ─────────────────────────────────────────────────
+  const xStep = _gNice((xMax - xMin) / 8);
+  const yStep = _gNice((yMax - yMin) / 6);
+  ctx.strokeStyle = 'rgba(99,102,241,0.07)'; ctx.lineWidth = 1;
+
+  const xStart = Math.ceil(xMin / xStep) * xStep;
+  for (let x = xStart; x <= xMax + xStep * 0.01; x += xStep) {
     const cx = toX(x);
-    gctx.beginPath(); gctx.moveTo(cx, PAD.t); gctx.lineTo(cx, H - PAD.b); gctx.stroke();
-    gctx.fillStyle = 'rgba(123,144,184,0.7)'; gctx.font = '10px Outfit';
-    gctx.textAlign = 'center'; gctx.textBaseline = 'top';
-    gctx.fillText(x, cx, H - PAD.b + 4);
+    if (cx < PAD.l - 1 || cx > W - PAD.r + 1) continue;
+    ctx.beginPath(); ctx.moveTo(cx, PAD.t); ctx.lineTo(cx, H - PAD.b); ctx.stroke();
+  }
+  const yStart = Math.ceil(yMin / yStep) * yStep;
+  for (let y = yStart; y <= yMax + yStep * 0.01; y += yStep) {
+    const cy = toY(y);
+    if (cy < PAD.t - 1 || cy > H - PAD.b + 1) continue;
+    ctx.beginPath(); ctx.moveTo(PAD.l, cy); ctx.lineTo(W - PAD.r, cy); ctx.stroke();
   }
 
-  // axes
-  gctx.strokeStyle = 'rgba(240,244,255,0.15)'; gctx.lineWidth = 1.5;
+  // ── AXIS OF SYMMETRY (dashed) ─────────────────────────────
+  const symX = toX(h);
+  ctx.save();
+  ctx.setLineDash([5, 4]);
+  ctx.strokeStyle = 'rgba(168,85,247,0.38)'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(symX, PAD.t); ctx.lineTo(symX, H - PAD.b); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // ── AXES ─────────────────────────────────────────────────
   const zeroY = toY(0), zeroX = toX(0);
+  const axCol = 'rgba(241,245,249,0.2)';
+  ctx.fillStyle = axCol; ctx.strokeStyle = axCol; ctx.lineWidth = 1.5;
+
   if (zeroY >= PAD.t && zeroY <= H - PAD.b) {
-    gctx.beginPath(); gctx.moveTo(PAD.l, zeroY); gctx.lineTo(W - PAD.r, zeroY); gctx.stroke();
-    gctx.fillStyle = 'rgba(123,144,184,0.6)'; gctx.font = '10px Outfit';
-    gctx.textAlign = 'right'; gctx.textBaseline = 'middle';
-    gctx.fillText('0', PAD.l - 4, zeroY);
+    ctx.beginPath(); ctx.moveTo(PAD.l, zeroY); ctx.lineTo(W - PAD.r + 10, zeroY); ctx.stroke();
+    _gArrow(ctx, W - PAD.r + 10, zeroY, 'right');
   }
   if (zeroX >= PAD.l && zeroX <= W - PAD.r) {
-    gctx.beginPath(); gctx.moveTo(zeroX, PAD.t); gctx.lineTo(zeroX, H - PAD.b); gctx.stroke();
+    ctx.beginPath(); ctx.moveTo(zeroX, H - PAD.b); ctx.lineTo(zeroX, PAD.t - 10); ctx.stroke();
+    _gArrow(ctx, zeroX, PAD.t - 10, 'up');
   }
 
-  // axis labels
-  gctx.fillStyle = 'rgba(123,144,184,0.7)'; gctx.font = '11px Outfit';
-  gctx.textAlign = 'center'; gctx.textBaseline = 'top';
-  gctx.fillText('x', W - PAD.r, H - PAD.b + 4);
-  gctx.textAlign = 'left'; gctx.textBaseline = 'top';
-  gctx.fillText('f(x)', PAD.l + 4, PAD.t);
+  // ── TICK LABELS ──────────────────────────────────────────
+  const tickCol = 'rgba(100,116,139,0.7)';
+  ctx.font = '10px Outfit, sans-serif';
 
-  // parabola with gradient
-  const grad = gctx.createLinearGradient(PAD.l, 0, W - PAD.r, 0);
-  grad.addColorStop(0,   'rgba(59,130,246,0.5)');
-  grad.addColorStop(0.5, '#60A5FA');
-  grad.addColorStop(1,   'rgba(59,130,246,0.5)');
-  gctx.beginPath();
-  let first = true;
-  for (let x = xMin; x <= xMax; x += (xMax - xMin) / 300) {
-    const y  = a * x * x + b * x + c;
-    const cx = toX(x), cy = toY(y);
-    if (first) { gctx.moveTo(cx, cy); first = false; } else { gctx.lineTo(cx, cy); }
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillStyle = tickCol;
+  for (let x = xStart; x <= xMax + xStep * 0.01; x += xStep) {
+    if (Math.abs(x) < xStep * 0.01) continue;
+    const cx = toX(x);
+    if (cx < PAD.l || cx > W - PAD.r) continue;
+    ctx.fillText(fmt(x), cx, H - PAD.b + 6);
   }
-  gctx.strokeStyle = grad; gctx.lineWidth = 2.5; gctx.stroke();
 
-  // vertex
-  const vx = toX(h), vy = toY(k);
-  gctx.beginPath(); gctx.arc(vx, vy, 5.5, 0, Math.PI * 2);
-  gctx.fillStyle = '#F59E0B'; gctx.fill();
-  gctx.fillStyle = '#FCD34D';
-  gctx.font = 'bold 11px Outfit'; gctx.textAlign = 'center';
-  gctx.textBaseline = k > yMin + (yMax - yMin) * 0.15 ? 'bottom' : 'top';
-  gctx.fillText(`V(${fmt(h)}, ${fmt(k)})`, vx, vy + (k > yMin + (yMax - yMin) * 0.15 ? -8 : 8));
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillStyle = tickCol;
+  for (let y = yStart; y <= yMax + yStep * 0.01; y += yStep) {
+    if (Math.abs(y) < yStep * 0.01) continue;
+    const cy = toY(y);
+    if (cy < PAD.t || cy > H - PAD.b) continue;
+    ctx.fillText(fmt(y), PAD.l - 5, cy);
+  }
 
-  // roots
-  roots.forEach(rx => {
-    if (rx < xMin || rx > xMax) return;
+  // origin + axis name labels
+  if (zeroY > PAD.t && zeroY < H - PAD.b && zeroX > PAD.l && zeroX < W - PAD.r) {
+    ctx.fillStyle = 'rgba(100,116,139,0.5)';
+    ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+    ctx.fillText('0', PAD.l - 4, zeroY + 3);
+  }
+  ctx.fillStyle = 'rgba(100,116,139,0.5)';
+  ctx.font = 'italic 11px Outfit, sans-serif';
+  const xLY = (zeroY >= PAD.t && zeroY <= H - PAD.b) ? zeroY + 6 : H - PAD.b + 5;
+  ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.fillText('x', W - PAD.r + 12, xLY);
+  const yLX = (zeroX >= PAD.l && zeroX <= W - PAD.r) ? zeroX + 4 : PAD.l + 2;
+  ctx.textBaseline = 'bottom';
+  ctx.fillText('f(x)', yLX, PAD.t - 12);
+
+  // ── AREA FILL UNDER CURVE ────────────────────────────────
+  const fillG = ctx.createLinearGradient(0, PAD.t, 0, H - PAD.b);
+  if (a > 0) { fillG.addColorStop(0, 'rgba(99,102,241,0.02)'); fillG.addColorStop(1, 'rgba(99,102,241,0.16)'); }
+  else       { fillG.addColorStop(0, 'rgba(99,102,241,0.16)'); fillG.addColorStop(1, 'rgba(99,102,241,0.02)'); }
+  const clipY = Math.max(PAD.t, Math.min(H - PAD.b, toY(0)));
+  ctx.beginPath();
+  for (let i = 0; i <= N; i++) {
+    const cx = toX(ptX[i]), cy = clpY(toY(ptY[i]));
+    i === 0 ? ctx.moveTo(cx, cy) : ctx.lineTo(cx, cy);
+  }
+  ctx.lineTo(toX(xMax), clipY); ctx.lineTo(toX(xMin), clipY); ctx.closePath();
+  ctx.fillStyle = fillG; ctx.fill();
+
+  // ── PARABOLA CURVE with glow ─────────────────────────────
+  ctx.save();
+  ctx.shadowColor = 'rgba(129,140,248,0.55)'; ctx.shadowBlur = 16;
+  const cg = ctx.createLinearGradient(PAD.l, 0, W - PAD.r, 0);
+  cg.addColorStop(0,   'rgba(99,102,241,0.55)');
+  cg.addColorStop(0.4, '#818CF8');
+  cg.addColorStop(0.6, '#A5B4FC');
+  cg.addColorStop(1,   'rgba(99,102,241,0.55)');
+  ctx.beginPath();
+  for (let i = 0; i <= N; i++) {
+    const cx = toX(ptX[i]), cy = clpY(toY(ptY[i]));
+    i === 0 ? ctx.moveTo(cx, cy) : ctx.lineTo(cx, cy);
+  }
+  ctx.strokeStyle = cg; ctx.lineWidth = 3;
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.stroke();
+  ctx.restore();
+
+  // ── AXIS OF SYMMETRY LABEL ───────────────────────────────
+  ctx.fillStyle = 'rgba(192,132,252,0.85)';
+  ctx.font = '10px Outfit, sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.fillText(`x = ${fmt(h)}`, symX, PAD.t + 5);
+
+  // ── ROOT MARKERS ─────────────────────────────────────────
+  (roots || []).forEach(rx => {
+    if (rx < xMin - 0.5 || rx > xMax + 0.5) return;
     const cx = toX(rx), cy = toY(0);
-    gctx.beginPath(); gctx.arc(cx, cy, 5, 0, Math.PI * 2);
-    gctx.fillStyle = '#10B981'; gctx.fill();
-    gctx.fillStyle = '#34D399';
-    gctx.font = '10px Outfit'; gctx.textAlign = 'center'; gctx.textBaseline = 'bottom';
-    gctx.fillText(fmt(rx), cx, cy - 7);
+    ctx.save();
+    ctx.shadowColor = '#10B981'; ctx.shadowBlur = 14;
+    ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+    ctx.fillStyle = '#10B981'; ctx.fill();
+    ctx.restore();
+    ctx.beginPath(); ctx.arc(cx, cy, 10.5, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(16,185,129,0.22)'; ctx.lineWidth = 2; ctx.stroke();
+    _gTag(ctx, `x = ${fmt(rx)}`, cx, cy - 14, '#34D399',
+      { font: 'bold 10px Outfit,sans-serif', bg: 'rgba(16,185,129,0.18)' });
   });
+
+  // ── VERTEX MARKER ────────────────────────────────────────
+  const vx = toX(h), vy = toY(k);
+  ctx.save();
+  ctx.shadowColor = '#F59E0B'; ctx.shadowBlur = 20;
+  ctx.beginPath(); ctx.arc(vx, vy, 7, 0, Math.PI * 2);
+  ctx.fillStyle = '#F59E0B'; ctx.fill();
+  ctx.restore();
+  ctx.beginPath(); ctx.arc(vx, vy, 12, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(245,158,11,0.28)'; ctx.lineWidth = 2; ctx.stroke();
+  const vAbove = vy > H / 2;
+  _gTag(ctx, `V(${fmt(h)}, ${fmt(k)})`, vx, vAbove ? vy - 17 : vy + 26, '#FCD34D',
+    { font: 'bold 11px Outfit,sans-serif', bg: 'rgba(245,158,11,0.18)', above: vAbove });
+
+  // ── INFO BADGES (top-right) ──────────────────────────────
+  const dCol = disc > 0 ? '#34D399' : disc === 0 ? '#818CF8' : '#F87171';
+  _gTag(ctx, `Δ = ${fmt(disc)}`, W - PAD.r - 4, PAD.t + 4, dCol,
+    { font: 'bold 10px Outfit,sans-serif', bg: 'rgba(3,7,18,.75)', align: 'right', above: false });
+  _gTag(ctx, a > 0 ? '∪ opens up' : '∩ opens down', W - PAD.r - 4, PAD.t + 24, 'rgba(165,180,252,.85)',
+    { font: '10px Outfit,sans-serif', bg: 'rgba(3,7,18,.75)', align: 'right', above: false });
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1596,10 +1720,6 @@ function applyLang(lang) {
     // Phase caption + stepper
     if (ANIM) updatePhaseUI(ANIM.phase);
 
-    // Quiz card title
-    const qTitle = document.getElementById('quizCardTitle');
-    if (qTitle) qTitle.textContent = lang === 'ms' ? 'Uji Kefahaman Anda' : 'Test Your Understanding';
-
     // Vertex label
     const vLabel = document.querySelector('.vertex-label');
     if (vLabel) vLabel.textContent = lang === 'ms' ? 'Bucu =' : 'Vertex =';
@@ -1681,129 +1801,6 @@ function generateInsight() {
 // ─────────────────────────────────────────────────────────────
 //  QUIZ — generated after animation completes
 // ─────────────────────────────────────────────────────────────
-function generateQuiz() {
-  const sec = document.getElementById('quizSection');
-  const container = document.getElementById('quizQuestions');
-  const resultDiv = document.getElementById('quizResult');
-  if (!sec || !container || !STATE) return;
-
-  sec.classList.remove('hidden');
-  if (resultDiv) resultDiv.classList.add('hidden');
-
-  const { a, b, c, h, k, disc, roots } = STATE;
-  const ms = currentLang === 'ms';
-
-  const shuffle = arr => arr.sort(() => Math.random() - 0.5);
-
-  const questions = [
-    {
-      q: ms ? 'Apakah bucu (titik pusingan) parabola ini?' : 'What is the vertex (turning point) of this parabola?',
-      options: shuffle([
-        { text: `(${fmt(h)}, ${fmt(k)})`, correct: true },
-        { text: `(${fmt(-h)}, ${fmt(k)})`, correct: false },
-        { text: `(${fmt(h)}, ${fmt(-k)})`, correct: false },
-        { text: `(${fmt(-h)}, ${fmt(-k)})`, correct: false },
-      ]),
-      explain: ms
-        ? `Bucu ialah (h, k) dalam bentuk bucu. Di sini h = ${fmt(h)}, k = ${fmt(k)}.`
-        : `The vertex is (h, k) in vertex form. Here h = ${fmt(h)}, k = ${fmt(k)}.`,
-    },
-    {
-      q: ms ? 'Berapa banyak punca nyata yang ada untuk persamaan ini?' : 'How many real roots does this equation have?',
-      options: shuffle([
-        { text: ms ? '0 (tiada punca nyata)' : '0 (no real roots)', correct: disc < 0 },
-        { text: ms ? '1 (punca berganda)' : '1 (double root)', correct: disc === 0 },
-        { text: ms ? '2 punca nyata' : '2 real roots', correct: disc > 0 },
-      ]),
-      explain: ms
-        ? `Pembeza Δ = ${fmt(disc)}. ${disc > 0 ? 'Δ > 0 → 2 punca nyata.' : disc === 0 ? 'Δ = 0 → 1 punca nyata (berganda).' : 'Δ < 0 → tiada punca nyata.'}`
-        : `Discriminant Δ = ${fmt(disc)}. ${disc > 0 ? 'Δ > 0 → 2 real roots.' : disc === 0 ? 'Δ = 0 → 1 real root (double).' : 'Δ < 0 → no real roots.'}`,
-    },
-    {
-      q: ms ? `Pekali a = ${fmt(a)}. Apakah kesannya terhadap parabola?` : `The coefficient a = ${fmt(a)}. What does this tell you?`,
-      options: shuffle([
-        {
-          text: a > 0
-            ? (ms ? 'Terbuka ke atas — titik minimum' : 'Opens upward — minimum point')
-            : (ms ? 'Terbuka ke bawah — titik maksimum' : 'Opens downward — maximum point'),
-          correct: true,
-        },
-        {
-          text: a > 0
-            ? (ms ? 'Terbuka ke bawah — titik maksimum' : 'Opens downward — maximum point')
-            : (ms ? 'Terbuka ke atas — titik minimum' : 'Opens upward — minimum point'),
-          correct: false,
-        },
-        {
-          text: ms ? 'Menentukan pintasan-y sahaja' : 'Determines only the y-intercept',
-          correct: false,
-        },
-      ]),
-      explain: ms
-        ? `a = ${fmt(a)} ${a > 0 ? '> 0, jadi parabola terbuka ke atas → titik minimum.' : '< 0, jadi parabola terbuka ke bawah → titik maksimum.'}`
-        : `a = ${fmt(a)} ${a > 0 ? '> 0, so the parabola opens upward → minimum point.' : '< 0, so parabola opens downward → maximum point.'}`,
-    },
-  ];
-
-  window._quiz = { questions, answered: new Array(questions.length).fill(false), correct: 0 };
-
-  container.innerHTML = questions.map((q, qi) => `
-    <div class="quiz-q" id="qq${qi}">
-      <div class="quiz-q-label">${ms ? 'Soalan' : 'Q'}${qi + 1}</div>
-      <div class="quiz-q-text">${q.q}</div>
-      <div class="quiz-options">
-        ${q.options.map((opt) =>
-          `<button class="quiz-opt" data-qi="${qi}" data-correct="${opt.correct}" onclick="answerQuiz(this,${qi},${opt.correct})">${opt.text}</button>`
-        ).join('')}
-      </div>
-      <div class="quiz-explain hidden" id="qex${qi}">${q.explain}</div>
-    </div>
-  `).join('');
-
-  const retryBtn = document.getElementById('quizRetry');
-  if (retryBtn) retryBtn.onclick = generateQuiz;
-}
-
-function answerQuiz(btn, qi, isCorrect) {
-  if (!window._quiz || window._quiz.answered[qi]) return;
-  window._quiz.answered[qi] = true;
-
-  const qDiv = document.getElementById(`qq${qi}`);
-  qDiv.querySelectorAll('.quiz-opt').forEach(b => {
-    b.disabled = true;
-    if (b.dataset.correct === 'true') b.classList.add('correct');
-    else if (b === btn && !isCorrect) b.classList.add('incorrect');
-  });
-
-  if (isCorrect) window._quiz.correct++;
-
-  document.getElementById(`qex${qi}`).classList.remove('hidden');
-
-  if (window._quiz.answered.every(Boolean)) {
-    showQuizResult(window._quiz.correct, window._quiz.questions.length);
-  }
-}
-
-function showQuizResult(score, total) {
-  const result = document.getElementById('quizResult');
-  if (!result) return;
-  result.classList.remove('hidden');
-
-  const ms = currentLang === 'ms';
-  const badge = document.getElementById('quizScoreBadge');
-  const msg   = document.getElementById('quizResultMsg');
-
-  badge.textContent = `${score} / ${total}`;
-  badge.className = 'quiz-score-badge ' + (score === total ? 'perfect' : score >= Math.ceil(total / 2) ? 'good' : 'low');
-
-  if (score === total) {
-    msg.textContent = ms ? '🎉 Cemerlang! Anda memahaminya dengan baik!' : '🎉 Excellent! You understand it well!';
-  } else if (score >= Math.ceil(total / 2)) {
-    msg.textContent = ms ? '👍 Bagus! Teruskan berlatih!' : '👍 Good job! Keep practicing!';
-  } else {
-    msg.textContent = ms ? '📚 Cuba lagi! Tonton animasi sekali lagi dan semak setiap fasa.' : '📚 Try again! Watch the animation again and review each phase.';
-  }
-}
 
 // ─────────────────────────────────────────────────────────────
 //  STEP HIGHLIGHT SYNC — syncs the active step card with phase
@@ -2004,7 +2001,9 @@ let _floatEnabled = true;
 function toggleTheme() {
   const html  = document.documentElement;
   const isLight = html.getAttribute('data-theme') === 'light';
-  html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+  const next = isLight ? 'dark' : 'light';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('qv_theme', next);
 
   const icon  = document.getElementById('themeIcon');
   const label = document.getElementById('themeLabel');
