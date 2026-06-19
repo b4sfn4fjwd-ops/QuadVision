@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>try{var t=localStorage.getItem('qv_theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>QuadVision – Completing the Square</title>
-  <link rel="icon" href="favicon.svg" />
+  <link rel="icon" href="images/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
@@ -39,6 +40,10 @@
       <li class="sidebar-item" id="sNav-team" onclick="sidebarScrollTo('teamSection', this)">
         <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><circle cx="9" cy="7" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="18" cy="8" r="2.5"/><path d="M15.5 20c0-2.5 1.1-4.5 3-5.3"/></svg>
         <span class="sidebar-label" data-en="Team" data-ms="Pasukan">Team</span>
+      </li>
+      <li class="sidebar-item" id="sNav-reallife" onclick="window.location='real-life.html'">
+        <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+        <span class="sidebar-label" data-en="Real Life" data-ms="Kehidupan Nyata">Real Life</span>
       </li>
     </ul>
     <div class="sidebar-bottom">
@@ -344,21 +349,6 @@
         <canvas id="graphCanvas"></canvas>
       </div>
 
-      <!-- QUIZ SECTION (populated by JS when animation completes) -->
-      <div class="quiz-card card reveal hidden" id="quizSection">
-        <div class="quiz-header">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-          <span class="card-title" id="quizCardTitle" data-en="Test Your Understanding" data-ms="Uji Kefahaman Anda">Test Your Understanding</span>
-        </div>
-        <div class="quiz-questions" id="quizQuestions"></div>
-        <div class="quiz-result hidden" id="quizResult">
-          <div class="quiz-score-badge" id="quizScoreBadge"></div>
-          <div class="quiz-result-msg" id="quizResultMsg"></div>
-          <button class="quiz-retry" id="quizRetry">
-            <span data-en="Try Again" data-ms="Cuba Lagi">Try Again</span>
-          </button>
-        </div>
-      </div>
 
     </div><!-- /resultsSection -->
 
